@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f6f8;
+        padding: 20px;
+    }
+
+    h1 {
+        color: #333;
+    }
+
+    h2 {
+        margin-top: 20px;
+    }
+
+    input {
+        padding: 8px;
+        margin: 5px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    button {
+        padding: 8px 12px;
+        margin: 5px;
+        border: none;
+        border-radius: 5px;
+        background-color: #007bff;
+        color: white;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background-color: #0056b3;
+    }
+
+    ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    li {
+        background: white;
+        margin: 8px 0;
+        padding: 10px;
+        border-radius: 5px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+</style>
+    <title>User API</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+
+    <h1>User API</h1>
+
+    <h2>Create User</h2>
+    <input type="text" id="name" placeholder="Name">
+    <input type="number" id="age" placeholder="Age">
+    <button onclick="createUser()">Create</button>
+
+    <h2>Users</h2>
+    <ul id="userList"></ul>
+
+<script>
+
+const API = "http://localhost:8080/users";
+
+async function loadUsers() {
+    const res = await fetch(API);
+    const users = await res.json();
+
+    const list = document.getElementById("userList");
+    list.innerHTML = "";
+
+    users.forEach(user => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+            ${user.id} - ${user.name} (${user.age})
+            <button onclick="deleteUser(${user.id})">Delete</button>
+        `;
+        list.appendChild(li);
+    });
+}
+
+async function createUser() {
+    const name = document.getElementById("name").value;
+    const age = document.getElementById("age").value;
+
+    await fetch(API, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ name, age })
+    });
+
+    loadUsers();
+}
+
+async function deleteUser(id) {
+    await fetch(`${API}/${id}`, {
+        method: "DELETE"
+    });
+
+    loadUsers();
+}
+
+loadUsers();
+
+</script>
+
+</body>
+</html>
